@@ -1,11 +1,11 @@
 // Copyright 2016 Russell Haering et al.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     https://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/russellhaering/gosaml2"
+	saml2 "github.com/russellhaering/gosaml2"
 )
 
 var pingFedScenarioErrors = map[int]string{
@@ -55,14 +55,14 @@ var pingFedAtTimes = map[int]string{}
 
 func TestPingFedCasesLocally(t *testing.T) {
 	sp := &saml2.SAMLServiceProvider{
-		IdentityProviderSSOURL:      "https://saml.test.nope:9031/eid/sxpmrhbkzn", // not required for these tests
-		IdentityProviderIssuer:      "https://saml.test.nope:9031/eid/sxpmrhbkzn",
-		AssertionConsumerServiceURL: "https://saml.test.nope/session/sso/saml/acs/hp24dqnpvq",
-		AudienceURI:                 "https://saml.test.nope/session/sso/saml/spentityid/hp24dqnpvq",
-		IDPCertificateStore:         LoadCertificateStore("./testdata/pingfed/idp.signing.cert"),
-		SPKeyStore:                  LoadKeyStore("./testdata/pingfed/sp.encryption.cert", "./testdata/pingfed/sp.encryption.key"),
-		SPSigningKeyStore:           LoadKeyStore("./testdata/pingfed/sp.signing.cert", "./testdata/pingfed/sp.signing.key"),
-		ValidateEncryptionCert:      true,
+		IdentityProviderSSOURL:       "https://saml.test.nope:9031/eid/sxpmrhbkzn", // not required for these tests
+		IdentityProviderIssuer:       "https://saml.test.nope:9031/eid/sxpmrhbkzn",
+		AssertionConsumerServiceURLs: []string{"https://saml.test.nope/session/sso/saml/acs/hp24dqnpvq"},
+		AudienceURI:                  "https://saml.test.nope/session/sso/saml/spentityid/hp24dqnpvq",
+		IDPCertificateStore:          LoadCertificateStore("./testdata/pingfed/idp.signing.cert"),
+		SPKeyStore:                   LoadKeyStore("./testdata/pingfed/sp.encryption.cert", "./testdata/pingfed/sp.encryption.key"),
+		SPSigningKeyStore:            LoadKeyStore("./testdata/pingfed/sp.signing.cert", "./testdata/pingfed/sp.signing.key"),
+		ValidateEncryptionCert:       true,
 	}
 
 	scenarios := []ProviderTestScenario{}

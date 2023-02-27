@@ -139,14 +139,14 @@ func TestSAML(t *testing.T) {
 	}
 
 	sp := &SAMLServiceProvider{
-		IdentityProviderSSOURL:      "https://dev-116807.oktapreview.com/app/scaleftdev116807_scaleft_1/exk5zt0r12Edi4rD20h7/sso/saml",
-		IdentityProviderIssuer:      "http://www.okta.com/exk5zt0r12Edi4rD20h7",
-		AssertionConsumerServiceURL: "http://localhost:8080/v1/_saml_callback",
-		SignAuthnRequests:           true,
-		AudienceURI:                 "123",
-		IDPCertificateStore:         &certStore,
-		SPKeyStore:                  randomKeyStore,
-		NameIdFormat:                NameIdFormatPersistent,
+		IdentityProviderSSOURL:       "https://dev-116807.oktapreview.com/app/scaleftdev116807_scaleft_1/exk5zt0r12Edi4rD20h7/sso/saml",
+		IdentityProviderIssuer:       "http://www.okta.com/exk5zt0r12Edi4rD20h7",
+		AssertionConsumerServiceURLs: []string{"http://localhost:8080/v1/_saml_callback"},
+		SignAuthnRequests:            true,
+		AudienceURI:                  "123",
+		IDPCertificateStore:          &certStore,
+		SPKeyStore:                   randomKeyStore,
+		NameIdFormat:                 NameIdFormatPersistent,
 	}
 
 	authRequestURL, err := sp.BuildAuthURL("/some/link/here")

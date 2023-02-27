@@ -22,14 +22,15 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"strings"
 
 	"encoding/xml"
 
 	"github.com/beevik/etree"
+	rtvalidator "github.com/mattermost/xml-roundtrip-validator"
 	"github.com/russellhaering/gosaml2/types"
 	dsig "github.com/russellhaering/goxmldsig"
 	"github.com/russellhaering/goxmldsig/etreeutils"
-	rtvalidator "github.com/mattermost/xml-roundtrip-validator"
 )
 
 func (sp *SAMLServiceProvider) validationContext() *dsig.ValidationContext {
@@ -41,11 +42,19 @@ func (sp *SAMLServiceProvider) validationContext() *dsig.ValidationContext {
 // validateResponseAttributes validates a SAML Response's tag and attributes. It does
 // not inspect child elements of the Response at all.
 func (sp *SAMLServiceProvider) validateResponseAttributes(response *types.Response) error {
-	if response.Destination != "" && response.Destination != sp.AssertionConsumerServiceURL {
-		return ErrInvalidValue{
-			Key:      DestinationAttr,
-			Expected: sp.AssertionConsumerServiceURL,
-			Actual:   response.Destination,
+	if response.Destination != "" {
+		var found bool
+		for _, url := range sp.AssertionConsumerServiceURLs {
+			if response.Destination == url {
+				found = true
+			}
+		}
+		if !found {
+			return ErrInvalidValue{
+				Key:      DestinationAttr,
+				Expected: strings.Join(sp.AssertionConsumerServiceURLs, ", "),
+				Actual:   response.Destination,
+			}
 		}
 	}
 
@@ -250,9 +259,9 @@ func (sp *SAMLServiceProvider) validateAssertionSignatures(el *etree.Element) er
 	}
 }
 
-//ValidateEncodedResponse both decodes and validates, based on SP
-//configuration, an encoded, signed response. It will also appropriately
-//decrypt a response if the assertion was encrypted
+// ValidateEncodedResponse both decodes and validates, based on SP
+// configuration, an encoded, signed response. It will also appropriately
+// decrypt a response if the assertion was encrypted
 func (sp *SAMLServiceProvider) ValidateEncodedResponse(encodedResponse string) (*types.Response, error) {
 	raw, err := base64.StdEncoding.DecodeString(encodedResponse)
 	if err != nil {

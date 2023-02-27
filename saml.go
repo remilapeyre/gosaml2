@@ -43,9 +43,9 @@ type SAMLServiceProvider struct {
 	IdentityProviderSLOBinding string
 	IdentityProviderIssuer     string
 
-	AssertionConsumerServiceURL string
-	ServiceProviderSLOURL       string
-	ServiceProviderIssuer       string
+	AssertionConsumerServiceURLs []string
+	ServiceProviderSLOURL        string
+	ServiceProviderIssuer        string
 
 	SignAuthnRequests              bool
 	SignAuthnRequestsAlgorithm     string
@@ -135,6 +135,16 @@ func (sp *SAMLServiceProvider) Metadata() (*types.EntityDescriptor, error) {
 			},
 		})
 	}
+
+	assertionConsumerServices := []types.IndexedEndpoint{}
+	for i, url := range sp.AssertionConsumerServiceURLs {
+		assertionConsumerServices = append(assertionConsumerServices, types.IndexedEndpoint{
+			Binding:  BindingHttpPost,
+			Location: url,
+			Index:    i + 1,
+		})
+	}
+
 	return &types.EntityDescriptor{
 		ValidUntil: sp.Clock.Now().UTC().Add(time.Hour * 24 * 7), // 7 days
 		EntityID:   sp.ServiceProviderIssuer,
@@ -143,11 +153,7 @@ func (sp *SAMLServiceProvider) Metadata() (*types.EntityDescriptor, error) {
 			WantAssertionsSigned:       !sp.SkipSignatureValidation,
 			ProtocolSupportEnumeration: SAMLProtocolNamespace,
 			KeyDescriptors:             keyDescriptors,
-			AssertionConsumerServices: []types.IndexedEndpoint{{
-				Binding:  BindingHttpPost,
-				Location: sp.AssertionConsumerServiceURL,
-				Index:    1,
-			}},
+			AssertionConsumerServices:  assertionConsumerServices,
 		},
 	}, nil
 }
@@ -165,6 +171,15 @@ func (sp *SAMLServiceProvider) MetadataWithSLO(validityHours int64) (*types.Enti
 	if validityHours <= 0 {
 		// By default let's keep it to 7 days.
 		validityHours = int64(time.Hour * 24 * 7)
+	}
+
+	assertionConsumerServices := []types.IndexedEndpoint{}
+	for i, url := range sp.AssertionConsumerServiceURLs {
+		assertionConsumerServices = append(assertionConsumerServices, types.IndexedEndpoint{
+			Binding:  BindingHttpPost,
+			Location: url,
+			Index:    i + 1,
+		})
 	}
 
 	return &types.EntityDescriptor{
@@ -203,11 +218,7 @@ func (sp *SAMLServiceProvider) MetadataWithSLO(validityHours int64) (*types.Enti
 					},
 				},
 			},
-			AssertionConsumerServices: []types.IndexedEndpoint{{
-				Binding:  BindingHttpPost,
-				Location: sp.AssertionConsumerServiceURL,
-				Index:    1,
-			}},
+			AssertionConsumerServices: assertionConsumerServices,
 			SingleLogoutServices: []types.Endpoint{{
 				Binding:  BindingHttpPost,
 				Location: sp.ServiceProviderSLOURL,

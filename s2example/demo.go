@@ -18,6 +18,7 @@ import (
 	"crypto/x509"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"io/ioutil"
 
@@ -74,14 +75,14 @@ func main() {
 	randomKeyStore := dsig.RandomKeyStoreForTest()
 
 	sp := &saml2.SAMLServiceProvider{
-		IdentityProviderSSOURL:      metadata.IDPSSODescriptor.SingleSignOnServices[0].Location,
-		IdentityProviderIssuer:      metadata.EntityID,
-		ServiceProviderIssuer:       "http://example.com/saml/acs/example",
-		AssertionConsumerServiceURL: "http://localhost:8080/v1/_saml_callback",
-		SignAuthnRequests:           true,
-		AudienceURI:                 "http://example.com/saml/acs/example",
-		IDPCertificateStore:         &certStore,
-		SPKeyStore:                  randomKeyStore,
+		IdentityProviderSSOURL:       metadata.IDPSSODescriptor.SingleSignOnServices[0].Location,
+		IdentityProviderIssuer:       metadata.EntityID,
+		ServiceProviderIssuer:        "http://example.com/saml/acs/example",
+		AssertionConsumerServiceURLs: []string{"http://localhost:8080/v1/_saml_callback"},
+		SignAuthnRequests:            true,
+		AudienceURI:                  "http://example.com/saml/acs/example",
+		IDPCertificateStore:          &certStore,
+		SPKeyStore:                   randomKeyStore,
 	}
 
 	http.HandleFunc("/v1/_saml_callback", func(rw http.ResponseWriter, req *http.Request) {
@@ -130,7 +131,7 @@ func main() {
 	println(authURL)
 
 	println("Supply:")
-	fmt.Printf("  SP ACS URL      : %s\n", sp.AssertionConsumerServiceURL)
+	fmt.Printf("  SP ACS URL      : %s\n", strings.Join(sp.AssertionConsumerServiceURLs, ","))
 
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {

@@ -1,11 +1,11 @@
 // Copyright 2016 Russell Haering et al.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     https://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/russellhaering/gosaml2"
+	saml2 "github.com/russellhaering/gosaml2"
 )
 
 var oneLoginScenarioErrors = map[int]string{
@@ -191,14 +191,14 @@ var oneLoginAtTimes = map[int]string{
 
 func TestOneLoginCasesLocally(t *testing.T) {
 	sp := &saml2.SAMLServiceProvider{
-		IdentityProviderSSOURL:      "https://saml.idp.nope/h9gkjzvb3e", // not required for these tests
-		IdentityProviderIssuer:      "https://saml.idp.nope/h9gkjzvb3e",
-		AssertionConsumerServiceURL: "https://saml.sp.nope/session/sso/saml/acs/rq5jwkvb8z",
-		AudienceURI:                 "https://saml.sp.nope/session/sso/saml/spentityid/rq5jwkvb8z",
-		IDPCertificateStore:         LoadCertificateStore("./testdata/onelogin/idp.signing.cert"),
-		SPKeyStore:                  LoadKeyStore("./testdata/onelogin/sp.encryption.cert", "./testdata/onelogin/sp.encryption.key"),
-		SPSigningKeyStore:           LoadKeyStore("./testdata/onelogin/sp.signing.cert", "./testdata/onelogin/sp.signing.key"),
-		ValidateEncryptionCert:      true,
+		IdentityProviderSSOURL:       "https://saml.idp.nope/h9gkjzvb3e", // not required for these tests
+		IdentityProviderIssuer:       "https://saml.idp.nope/h9gkjzvb3e",
+		AssertionConsumerServiceURLs: []string{"https://saml.sp.nope/session/sso/saml/acs/rq5jwkvb8z"},
+		AudienceURI:                  "https://saml.sp.nope/session/sso/saml/spentityid/rq5jwkvb8z",
+		IDPCertificateStore:          LoadCertificateStore("./testdata/onelogin/idp.signing.cert"),
+		SPKeyStore:                   LoadKeyStore("./testdata/onelogin/sp.encryption.cert", "./testdata/onelogin/sp.encryption.key"),
+		SPSigningKeyStore:            LoadKeyStore("./testdata/onelogin/sp.signing.cert", "./testdata/onelogin/sp.signing.key"),
+		ValidateEncryptionCert:       true,
 	}
 
 	scenarios := []ProviderTestScenario{}

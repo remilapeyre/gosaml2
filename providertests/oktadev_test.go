@@ -1,11 +1,11 @@
 // Copyright 2016 Russell Haering et al.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     https://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,8 @@ import (
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/russellhaering/gosaml2"
-	"github.com/russellhaering/goxmldsig"
+	saml2 "github.com/russellhaering/gosaml2"
+	dsig "github.com/russellhaering/goxmldsig"
 )
 
 var oktaScenarioErrors = map[int]string{
@@ -50,12 +50,12 @@ var oktaScenarioWarnings = map[int]scenarioWarnings{
 
 func TestOktaDevCasesLocally(t *testing.T) {
 	sp := &saml2.SAMLServiceProvider{
-		IdentityProviderSSOURL:      "http://example.com/saml/acs/example",
-		IdentityProviderIssuer:      "http://example.com/saml/acs/example",
-		AssertionConsumerServiceURL: "http://dba9a5fc.ngrok.io/v1/_saml_callback",
-		AudienceURI:                 "http://example.com/saml/acs/example",
-		IDPCertificateStore:         LoadCertificateStore("./testdata/saml.oktadev.com/oktadev.pem"),
-		Clock:                       dsig.NewFakeClock(clockwork.NewFakeClockAt(time.Date(2017, 4, 4, 17, 54, 0, 0, time.UTC))),
+		IdentityProviderSSOURL:       "http://example.com/saml/acs/example",
+		IdentityProviderIssuer:       "http://example.com/saml/acs/example",
+		AssertionConsumerServiceURLs: []string{"http://dba9a5fc.ngrok.io/v1/_saml_callback"},
+		AudienceURI:                  "http://example.com/saml/acs/example",
+		IDPCertificateStore:          LoadCertificateStore("./testdata/saml.oktadev.com/oktadev.pem"),
+		Clock:                        dsig.NewFakeClock(clockwork.NewFakeClockAt(time.Date(2017, 4, 4, 17, 54, 0, 0, time.UTC))),
 	}
 
 	scenarios := []ProviderTestScenario{}

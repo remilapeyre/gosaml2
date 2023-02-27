@@ -25,9 +25,9 @@ import (
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/russellhaering/goxmldsig"
-	"github.com/stretchr/testify/require"
 	rtvalidator "github.com/mattermost/xml-roundtrip-validator"
+	dsig "github.com/russellhaering/goxmldsig"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -111,9 +111,9 @@ func testEncryptedAssertion(t *testing.T, validateEncryptionCert bool) {
 	require.NoError(t, err, "couldn't parse idp cert pem block")
 
 	sp := SAMLServiceProvider{
-		AssertionConsumerServiceURL: "https://saml2.test.astuart.co/sso/saml2",
-		SPKeyStore:                  dsig.TLSCertKeyStore(cert),
-		ValidateEncryptionCert:      validateEncryptionCert,
+		AssertionConsumerServiceURLs: []string{"https://saml2.test.astuart.co/sso/saml2"},
+		SPKeyStore:                   dsig.TLSCertKeyStore(cert),
+		ValidateEncryptionCert:       validateEncryptionCert,
 		IDPCertificateStore: &dsig.MemoryX509CertificateStore{
 			Roots: []*x509.Certificate{idpCert},
 		},
@@ -150,8 +150,8 @@ func TestCompressedResponse(t *testing.T) {
 	require.NoError(t, err, "couldn't parse okta cert pem block")
 
 	sp := SAMLServiceProvider{
-		AssertionConsumerServiceURL: "https://f1f51ddc.ngrok.io/api/sso/saml2/acs/58cafd0573d4f375b8e70e8e",
-		SPKeyStore:                  dsig.TLSCertKeyStore(cert),
+		AssertionConsumerServiceURLs: []string{"https://f1f51ddc.ngrok.io/api/sso/saml2/acs/58cafd0573d4f375b8e70e8e"},
+		SPKeyStore:                   dsig.TLSCertKeyStore(cert),
 		IDPCertificateStore: &dsig.MemoryX509CertificateStore{
 			Roots: []*x509.Certificate{idpCert},
 		},
@@ -194,11 +194,11 @@ func TestMalFormedInput(t *testing.T) {
 	}
 
 	sp := &SAMLServiceProvider{
-		Clock: dsig.NewFakeClock(clockwork.NewFakeClockAt(time.Date(2019, 8, 12, 12, 00, 52, 718, time.UTC))),
-		AssertionConsumerServiceURL: "https://saml2.test.astuart.co/sso/saml2",
-		SignAuthnRequests:           true,
-		IDPCertificateStore:         &certStore,
-		ValidateEncryptionCert:      true,
+		Clock:                        dsig.NewFakeClock(clockwork.NewFakeClockAt(time.Date(2019, 8, 12, 12, 00, 52, 718, time.UTC))),
+		AssertionConsumerServiceURLs: []string{"https://saml2.test.astuart.co/sso/saml2"},
+		SignAuthnRequests:            true,
+		IDPCertificateStore:          &certStore,
+		ValidateEncryptionCert:       true,
 	}
 	base64Input := base64.StdEncoding.EncodeToString([]byte(badInput))
 	_, err = sp.RetrieveAssertionInfo(base64Input)

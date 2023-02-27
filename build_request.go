@@ -43,7 +43,7 @@ func (sp *SAMLServiceProvider) buildAuthnRequest(includeSig bool) (*etree.Docume
 	authnRequest.CreateAttr("ID", "_"+arId.String())
 	authnRequest.CreateAttr("Version", "2.0")
 	authnRequest.CreateAttr("ProtocolBinding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST")
-	authnRequest.CreateAttr("AssertionConsumerServiceURL", sp.AssertionConsumerServiceURL)
+	authnRequest.CreateAttr("AssertionConsumerServiceURL", sp.AssertionConsumerServiceURLs[0])
 	authnRequest.CreateAttr("IssueInstant", sp.Clock.Now().UTC().Format(issueInstantFormat))
 	authnRequest.CreateAttr("Destination", sp.IdentityProviderSSOURL)
 	if sp.ForceAuthn {
@@ -254,7 +254,7 @@ func (sp *SAMLServiceProvider) buildAuthBodyPostFromDocument(relayState string, 
 	return rv.Bytes(), nil
 }
 
-//BuildAuthBodyPost builds the POST body to be sent to IDP.
+// BuildAuthBodyPost builds the POST body to be sent to IDP.
 func (sp *SAMLServiceProvider) BuildAuthBodyPost(relayState string) ([]byte, error) {
 	var doc *etree.Document
 	var err error
@@ -272,8 +272,8 @@ func (sp *SAMLServiceProvider) BuildAuthBodyPost(relayState string) ([]byte, err
 	return sp.buildAuthBodyPostFromDocument(relayState, doc)
 }
 
-//BuildAuthBodyPostFromDocument builds the POST body to be sent to IDP.
-//It takes the AuthnRequest xml as input.
+// BuildAuthBodyPostFromDocument builds the POST body to be sent to IDP.
+// It takes the AuthnRequest xml as input.
 func (sp *SAMLServiceProvider) BuildAuthBodyPostFromDocument(relayState string, doc *etree.Document) ([]byte, error) {
 	return sp.buildAuthBodyPostFromDocument(relayState, doc)
 }
@@ -382,8 +382,8 @@ func (sp *SAMLServiceProvider) BuildLogoutRequestDocument(nameID string, session
 	return sp.buildLogoutRequest(true, nameID, sessionIndex)
 }
 
-//BuildLogoutBodyPostFromDocument builds the POST body to be sent to IDP.
-//It takes the LogoutRequest xml as input.
+// BuildLogoutBodyPostFromDocument builds the POST body to be sent to IDP.
+// It takes the LogoutRequest xml as input.
 func (sp *SAMLServiceProvider) BuildLogoutBodyPostFromDocument(relayState string, doc *etree.Document) ([]byte, error) {
 	return sp.buildLogoutBodyPostFromDocument(relayState, doc)
 }
